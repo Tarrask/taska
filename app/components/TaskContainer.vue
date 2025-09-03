@@ -4,16 +4,25 @@
   </div>
   <div v-else class="p-2 flex flex-col h-full grow justify-end bg-gray-50" @dragover.prevent="dragLocation = { x: $event.clientX, y: $event.clientY }">
     <div class="flex gap-2">
-      <UButton class="mb-2 self-start" color="neutral" variant="outline" icon="material-symbols:add" @click="newTask" />
+      <UButton v-if="!newTask" class="mb-2 self-start" color="neutral" variant="outline" icon="material-symbols:add" @click="createNewTask()" />
       <UButton class="mb-2 self-start" color="neutral" variant="outline" icon="material-symbols:sync" @click="refreshTasks()" />
     </div>
+    <TaskView
+        v-if="newTask"
+        :task="newTask"
+        :editing="true"
+        class="mb-2"
+        @save="saveNewTask"
+        @cancel="newTask = null"
+      />
     <div ref="container" class="flex flex-col gap-2" @dragover="dragover">
       <TaskView
         v-for="(task, index) in tasks"
         :key="task.id"
         :task="task"
         :data-index="index"
-        @update:task="updateTask"
+        @save="updateTask"
+        @delete="deleteTask"
         @dragstart="dragstart"
         @dragend="dragend"
       />
@@ -32,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Task } from '~/types/Task.d.ts'
+import type { Task } from '~~/types/Task'
 
 const { 
   data: tasksData, 
@@ -45,10 +54,6 @@ watch(tasksData, (newTasks) => {
   tasks.value = newTasks || []
 })
 
-async function newTask() {
-  
-}
-
 async function updateTask (updatedTask: Task) {
   const index = tasks.value.findIndex(t => t.id === updatedTask.id)
   if (index !== -1) {
@@ -57,18 +62,57 @@ async function updateTask (updatedTask: Task) {
   saveTasks()
 }
 
+async function deleteTask (taskToDelete: Task) {
+  const response = await fetch(`/api/task/${taskToDelete.id}`, {
+    method: 'DELETE'
+  })
+
+  if (response.ok) {
+    tasks.value = tasks.value.filter(t => t.id !== taskToDelete.id)
+  } else {
+    console.error('Failed to delete task:', response.statusText)
+  }
+}
+
 async function saveTasks () {
   await fetch('/api/task', {
-    method: 'POST',
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(tasks.value)
   })
 }
 
 //
+// New Task Logic
+//
+const newTask = ref<Task | null>(null)
+
+async function createNewTask() {
+  newTask.value = {
+    id: '',
+    title: 'New Task',
+    project: '',
+    size: 'sm'
+  }
+}
+
+async function saveNewTask (task: Task) {
+  const response = await fetch('/api/task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task)
+  })
+
+  const createdTask = await response.json()
+
+  tasks.value.unshift(createdTask)
+  newTask.value = null
+}
+
+//
 // Drag and Drop Logic
 //
-const container = useTemplateRef<HTMLElement>('container')
+const container = useTemplateRef('container')
 const draggedTaskIndex = ref<null | number>(null)
 const dragLocation = ref<{ x: number, y: number } | null>(null)
 const dragAnchor = ref<{ x: number, y: number }>({ x: 0, y: 0})

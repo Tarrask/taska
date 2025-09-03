@@ -1,6 +1,6 @@
 <template>
 <div 
-  class="bg-white border border-gray-300 rounded p-2 w-96 cursor-move [&.dragging]:opacity-0" 
+  class="bg-white border border-gray-300 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
   :class="`task-${task.size}`"
   :draggable="!editing"
   @dblclick="editTask()"
@@ -11,6 +11,7 @@
     <div class="mt-2 flex justify-end gap-2">
       <UButton size="sm" color="neutral" variant="outline" @click="cancelTask">Cancel</UButton>
       <UButton size="sm" color="primary" @click="saveTask">Save</UButton>
+      <UButton v-if="deletable" size="sm" color="error" @click="$emit('delete', task)">Delete</UButton>
     </div>
   </div>
   <div v-else>
@@ -21,22 +22,35 @@
 </template>
 
 <script setup lang="ts">
-  import type { Task } from '~/types/Task.d.ts'
+  import type { Task } from '~~/types/Task'
 
-  const task = defineModel<Task>('task', { default: { id: '', title: '', project: '', size: 'xs' } });
-  const { editable = true } = defineProps<{ editable?: boolean }>();
-  const editing = ref<boolean>(false)
+  const editing = defineModel<boolean>('editing', { default: false });
+  const { 
+    editable = true,
+    deletable = true,
+    task = { id: '', title: '', project: '', size: 'xs' }
+  } = defineProps<{ 
+    editable?: boolean 
+    deletable?: boolean
+    task?: Task
+  }>();
+
+  const emit = defineEmits<{
+    save: [Task],
+    cancel: [],
+    delete: [Task]
+  }>()
 
   const editableTask = ref<{  
     title: string
     project: string
-   }>({ title: task.value.title, project: task.value.project })
+   }>({ title: task.title, project: task.project })
 
   function editTask() {
     if(!editing.value && editable) {
       editableTask.value = { 
-        title: task.value.title, 
-        project: task.value.project 
+        title: task.title, 
+        project: task.project 
       }
       editing.value = true
     }
@@ -44,16 +58,16 @@
 
   function cancelTask() {
     editing.value = false
+    emit('cancel')
   }
 
   function saveTask() {
-    console.log('Saving task:', editableTask.value)
-    task.value = {
-      ...task.value,
+    editing.value = false
+    emit('save', {
+      ...task,
       title: editableTask.value.title,
       project: editableTask.value.project
-    }
-    editing.value = false
+    })
   }
 </script>
 

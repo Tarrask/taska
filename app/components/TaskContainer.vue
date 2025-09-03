@@ -23,6 +23,7 @@
         :data-index="index"
         @save="updateTask"
         @delete="deleteTask"
+        @done="doneTask"
         @dragstart="dragstart"
         @dragend="dragend"
       />
@@ -71,6 +72,18 @@ async function deleteTask (taskToDelete: Task) {
     tasks.value = tasks.value.filter(t => t.id !== taskToDelete.id)
   } else {
     console.error('Failed to delete task:', response.statusText)
+  }
+}
+
+async function doneTask (taskDone: Task) {
+  const response = await fetch(`/api/task/${taskDone.id}/done`, {
+    method: 'POST'
+  })
+
+  if (response.ok) {
+    tasks.value = tasks.value.filter(t => t.id !== taskDone.id)
+  } else {
+    console.error('Failed to mark task as done:', response.statusText)
   }
 }
 

@@ -1,7 +1,8 @@
 <template>
 <div 
-  class="bg-white border border-gray-300 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
+  class="border border-gray-300 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
   :class="`task-${task.size}`"
+  :style="{ 'background-color': task.color || '#ffffff' }"
   :draggable="!editing"
   @dblclick="editTask()"
 >
@@ -12,6 +13,17 @@
       <UButton size="sm" color="neutral" variant="outline" @click="cancelTask">Cancel</UButton>
       <UButton size="sm" color="primary" @click="saveTask">Save</UButton>
       <UButton v-if="deletable" size="sm" color="error" @click="$emit('delete', task)">Delete</UButton>
+      <UPopover>
+        <UButton label="Choose color" color="neutral" variant="outline">
+          <template #leading>
+            <span :style="chipStyle" class="size-3 rounded-full" />
+          </template>
+        </UButton>
+        <template #content>
+          <UColorPicker v-model="editableTask.color" class="p-2" />
+        </template>
+      </UPopover>
+      <UButton size="sm" color="primary" icon="pajamas:task-done" @click="$emit('done', task)">Done</UButton>
     </div>
   </div>
   <div v-else>
@@ -38,23 +50,28 @@
   const emit = defineEmits<{
     save: [Task],
     cancel: [],
-    delete: [Task]
+    delete: [Task],
+    done: [Task]
   }>()
 
   const editableTask = ref<{  
     title: string
     project: string
-   }>({ title: task.title, project: task.project })
+    color: string
+   }>({ title: task.title, project: task.project, color: task.color || '#ffffff' })
 
   function editTask() {
     if(!editing.value && editable) {
       editableTask.value = { 
         title: task.title, 
-        project: task.project 
+        project: task.project,
+        color: task.color || '#ffffff'
       }
       editing.value = true
     }
   }
+
+  const chipStyle = computed(() => ({ backgroundColor: editableTask.value.color }))
 
   function cancelTask() {
     editing.value = false
@@ -66,7 +83,8 @@
     emit('save', {
       ...task,
       title: editableTask.value.title,
-      project: editableTask.value.project
+      project: editableTask.value.project,
+      color: editableTask.value.color
     })
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
 <div 
-  class="border border-gray-300 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
+  class="border-2 border-black/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
   :class="`task-${task.size}`"
   :style="{ 'background-color': task.color || '#ffffff' }"
   :draggable="!editing"
@@ -24,6 +24,7 @@
         </template>
       </UPopover>
       <UButton size="sm" color="primary" icon="pajamas:task-done" @click="$emit('done', task)">Done</UButton>
+      <USelectMenu v-model="editableTask.size" :items="TaskSizes" />
     </div>
   </div>
   <div v-else>
@@ -35,7 +36,7 @@
 
 <script setup lang="ts">
   import type { Task } from '~~/types/Task'
-
+  const  TaskSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
   const editing = defineModel<boolean>('editing', { default: false });
   const { 
     editable = true,
@@ -58,14 +59,16 @@
     title: string
     project: string
     color: string
-   }>({ title: task.title, project: task.project, color: task.color || '#ffffff' })
+    size: Task['size']
+   }>({ title: task.title, project: task.project, color: task.color || '#ffffff', size: 'sm' })
 
   function editTask() {
     if(!editing.value && editable) {
       editableTask.value = { 
         title: task.title, 
         project: task.project,
-        color: task.color || '#ffffff'
+        color: task.color || '#ffffff',
+        size: task.size || 'sm'
       }
       editing.value = true
     }
@@ -82,9 +85,7 @@
     editing.value = false
     emit('save', {
       ...task,
-      title: editableTask.value.title,
-      project: editableTask.value.project,
-      color: editableTask.value.color
+      ...editableTask.value
     })
   }
 </script>

@@ -80,6 +80,8 @@ async function doneTask (taskDone: Task) {
     method: 'POST'
   })
 
+  
+
   if (response.ok) {
     tasks.value = tasks.value.filter(t => t.id !== taskDone.id)
   } else {

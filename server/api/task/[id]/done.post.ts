@@ -13,7 +13,13 @@ export default defineEventHandler(async (event) => {
     })
   }
   
-  tasks.splice(index, 1)
+  const completedTask = tasks.splice(index, 1)[0]
+
+  const completedTasks = (await dataStorage.getItem<Array<Task>>('completedTasks')) || []
+  completedTasks.push(completedTask)
+
+  await dataStorage.setItem('completedTasks', completedTasks)
   await dataStorage.setItem('tasks', tasks)
+  
   setResponseStatus(event, 204)
 })

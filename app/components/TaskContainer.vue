@@ -2,7 +2,14 @@
   <div v-if="taskError" class="p-4 bg-red-100 text-red-800">
     Error: {{ taskError.message }}
   </div>
-  <div v-else class="p-2 flex flex-col h-full grow justify-end bg-gray-50" @dragover.prevent="dragLocation = { x: $event.clientX, y: $event.clientY }">
+  <div 
+    v-else 
+    class="
+    bg-gray-50 
+    dark:bg-gray-900
+    p-2 flex flex-col h-full grow justify-end" 
+    @dragover.prevent="dragLocation = { x: $event.clientX, y: $event.clientY }"
+  >
     <div class="flex gap-2">
       <UButton v-if="!newTask" class="mb-2 self-start" color="neutral" variant="outline" icon="material-symbols:add" @click="createNewTask()" />
       <UButton class="mb-2 self-start" color="neutral" variant="outline" icon="material-symbols:sync" @click="refreshTasks()" />

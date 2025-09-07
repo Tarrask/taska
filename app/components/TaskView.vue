@@ -1,8 +1,8 @@
 <template>
 <div 
-  class="border-2 border-black/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0 max-w-full" 
-  :class="`task-${task.size}`"
-  :style="{ 'background-color': editableTask.color || '#ffffff' }"
+  class="border-2 border-black/10 dark:border-white/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0 max-w-full" 
+  :class="`task-${task.size} ${isBackgroundDark ? 'text-white' : 'text-black'}`"
+  :style="{ 'background-color': backgroundColor }"
   :draggable="!editing"
   @dblclick="editTask()"
 >
@@ -20,7 +20,7 @@
   </div>
   <div v-else>
     <h2 class="text-2xl">{{ task.title }}</h2>
-    <h3 class="text-gray-500">{{ task.topic }}</h3>
+    <h3 :class="isBackgroundDark ? 'text-white/50' : 'text-black/50'">{{ task.topic }}</h3>
     <ColorChooser v-model="editableTask.color" :full="false" @update:model-value="saveTask" />
   </div>
 </div>
@@ -64,6 +64,9 @@
       }
     }
   })
+
+  const backgroundColor = computed(() => editableTask.value.color || '#ffffff')
+  const isBackgroundDark = isDarkColor(backgroundColor)
 
   function editTask() {
     if(!editing.value && editable) {

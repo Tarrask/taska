@@ -4,6 +4,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/eslint', '@nuxt/ui'],
   css: ['~/assets/css/main.css'],
+  colorMode: {
+    disableTransition: false
+  },
   nitro: {
     storage: {
       data: {

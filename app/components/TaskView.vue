@@ -2,7 +2,7 @@
 <div 
   class="border-2 border-black/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
   :class="`task-${task.size}`"
-  :style="{ 'background-color': task.color || '#ffffff' }"
+  :style="{ 'background-color': editableTask.color || '#ffffff' }"
   :draggable="!editing"
   @dblclick="editTask()"
 >
@@ -10,27 +10,18 @@
     <UInput v-model="editableTask.title" placeholder="Task Title" class="mb-1 w-full" />
     <UInput v-model="editableTask.topic" placeholder="Topic Name" class="w-full" />
     <div class="mt-2 flex justify-end gap-2">
-      <UButton size="sm" color="neutral" variant="outline" @click="cancelTask">Cancel</UButton>
+      <UButton size="sm" color="neutral" @click="cancelTask">Cancel</UButton>
       <UButton size="sm" color="primary" @click="saveTask">Save</UButton>
       <UButton v-if="deletable" size="sm" color="error" @click="$emit('delete', task)">Delete</UButton>
-      <UPopover>
-        <UButton label="Choose color" color="neutral" variant="outline">
-          <template #leading>
-            <span :style="chipStyle" class="size-3 rounded-full" />
-          </template>
-        </UButton>
-        <template #content>
-          <UColorPicker v-model="editableTask.color" class="p-2" />
-        </template>
-      </UPopover>
+      <ColorChooser v-model="editableTask.color" size="sm" :full="true" />
       <UButton size="sm" color="primary" icon="pajamas:task-done" @click="$emit('done', task)">Done</UButton>
-      <USelectMenu v-model="editableTask.size" :items="TaskSizes" />
+      <USelectMenu v-model="editableTask.size" size="sm" :items="TaskSizes" />
     </div>
   </div>
   <div v-else>
     <h2 class="text-2xl">{{ task.title }}</h2>
     <h3 class="text-gray-500">{{ task.topic }}</h3>
-  </div>
+    <ColorChooser v-model="editableTask.color" :full="false" @update:model-value="saveTask" />
   </div>
 </div>
 </template>
@@ -63,6 +54,17 @@
     size: Task['size']
    }>({ title: task.title, topic: task.topic, color: task.color || '#ffffff', size: 'sm' })
 
+  watchEffect(() => {
+    if(!editing.value) {
+      editableTask.value = { 
+        title: task.title, 
+        topic: task.topic,
+        color: task.color || '#ffffff',
+        size: task.size || 'sm'
+      }
+    }
+  })
+
   function editTask() {
     if(!editing.value && editable) {
       editableTask.value = { 
@@ -74,8 +76,6 @@
       editing.value = true
     }
   }
-
-  const chipStyle = computed(() => ({ backgroundColor: editableTask.value.color }))
 
   function cancelTask() {
     editing.value = false

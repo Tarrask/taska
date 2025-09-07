@@ -3,7 +3,7 @@ export { Task, TaskSizes }
 type Task = {
   id: string
   title: string
-  project: string
+  topic: string
   color?: string
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 }

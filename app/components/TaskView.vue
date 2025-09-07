@@ -8,7 +8,7 @@
 >
   <div v-if="editing">
     <UInput v-model="editableTask.title" placeholder="Task Title" class="mb-1 w-full" />
-    <UInput v-model="editableTask.project" placeholder="Project Name" class="w-full" />
+    <UInput v-model="editableTask.topic" placeholder="Topic Name" class="w-full" />
     <div class="mt-2 flex justify-end gap-2">
       <UButton size="sm" color="neutral" variant="outline" @click="cancelTask">Cancel</UButton>
       <UButton size="sm" color="primary" @click="saveTask">Save</UButton>
@@ -29,7 +29,8 @@
   </div>
   <div v-else>
     <h2 class="text-2xl">{{ task.title }}</h2>
-    <h3 class="text-gray-500">{{ task.project }}</h3>
+    <h3 class="text-gray-500">{{ task.topic }}</h3>
+  </div>
   </div>
 </div>
 </template>
@@ -41,7 +42,7 @@
   const { 
     editable = true,
     deletable = true,
-    task = { id: '', title: '', project: '', size: 'xs' }
+    task = { id: '', title: '', topic: '', size: 'xs' }
   } = defineProps<{ 
     editable?: boolean 
     deletable?: boolean
@@ -57,16 +58,16 @@
 
   const editableTask = ref<{  
     title: string
-    project: string
+    topic: string
     color: string
     size: Task['size']
-   }>({ title: task.title, project: task.project, color: task.color || '#ffffff', size: 'sm' })
+   }>({ title: task.title, topic: task.topic, color: task.color || '#ffffff', size: 'sm' })
 
   function editTask() {
     if(!editing.value && editable) {
       editableTask.value = { 
         title: task.title, 
-        project: task.project,
+        topic: task.topic,
         color: task.color || '#ffffff',
         size: task.size || 'sm'
       }

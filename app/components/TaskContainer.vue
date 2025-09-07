@@ -106,7 +106,7 @@ async function createNewTask() {
   newTask.value = {
     id: '',
     title: 'New Task',
-    project: '',
+    topic: '',
     size: 'sm'
   }
 }

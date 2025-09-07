@@ -1,6 +1,6 @@
 <template>
 <div 
-  class="border-2 border-black/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0" 
+  class="border-2 border-black/10 rounded p-2 w-96 [[draggable=true]]:cursor-move [&.dragging]:opacity-0 max-w-full" 
   :class="`task-${task.size}`"
   :style="{ 'background-color': editableTask.color || '#ffffff' }"
   :draggable="!editing"

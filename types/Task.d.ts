@@ -4,7 +4,7 @@ type Task = {
   id: string
   title: string
   topic: string
-  color?: string
+  color?: number | string
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 }
 

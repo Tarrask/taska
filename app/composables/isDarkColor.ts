@@ -6,7 +6,6 @@ export const isDarkColor = (color: MaybeRefOrGetter<string>) => {
     const b = parseInt(colorValue.substring(5, 7), 16)
     const y = ((r * 299) + (g * 587) + (b * 114)) / 1000
 
-    console.log('isDarkColor:', colorValue, y<128)
     return y < 128
   })
 }

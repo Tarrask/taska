@@ -50,22 +50,24 @@
   const editableTask = ref<{  
     title: string
     topic: string
-    color: string
+    color: number|string
     size: Task['size']
-   }>({ title: task.title, topic: task.topic, color: task.color || '#ffffff', size: 'sm' })
+   }>({ title: task.title, topic: task.topic, color: task.color || 0, size: 'sm' })
 
   watchEffect(() => {
     if(!editing.value) {
       editableTask.value = { 
         title: task.title, 
         topic: task.topic,
-        color: task.color || '#ffffff',
+        color: task.color || 0,
         size: task.size || 'sm'
       }
     }
   })
 
-  const backgroundColor = computed(() => editableTask.value.color || '#ffffff')
+  const { toCssColor } = useColorPalette()
+
+  const backgroundColor = toCssColor(() => editableTask.value.color)
   const isBackgroundDark = isDarkColor(backgroundColor)
 
   function editTask() {

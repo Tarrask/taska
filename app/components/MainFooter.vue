@@ -14,5 +14,6 @@
     <a href="/contact-us" class="text-white hover:underline ml-4">
       Contact Us
     </a>
+    <ThemeChooser />
   </footer>
 </template>

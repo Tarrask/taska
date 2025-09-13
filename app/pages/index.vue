@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen *:transition-colors">
+  <div class="flex flex-col min-h-screen">
     <MainHeader />
     <TaskContainer />
     <MainFooter />

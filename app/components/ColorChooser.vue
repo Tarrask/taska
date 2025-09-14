@@ -9,7 +9,7 @@
       <span v-if="full" class="truncate">Color</span>
     </UButton>
     <template #content> 
-      <div class="grid grid-cols-3 gap-2 p-2">
+      <div class="grid grid-cols-4 gap-2 p-2">
         <UButton 
           v-for="(paletteColor, index) in palette" :key="paletteColor" 
           class="p-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inverted" 

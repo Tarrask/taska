@@ -75,7 +75,7 @@
       editableTask.value = { 
         title: task.title, 
         topic: task.topic,
-        color: task.color || '#ffffff',
+        color: task.color || 0,
         size: task.size || 'sm'
       }
       editing.value = true

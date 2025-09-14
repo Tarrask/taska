@@ -44,6 +44,7 @@
     :style="{
       top: dragLocation ? `${dragLocation.y - dragAnchor.y}px` : '-1000px',
       left: dragLocation ? `${dragLocation.x - dragAnchor.x}px` : '-1000px',
+      transform: `rotate(${dragRotation}deg)`
     }"
   />
 </template>
@@ -136,19 +137,25 @@ async function saveNewTask (task: Task) {
 //
 const container = useTemplateRef('container')
 const draggedTaskIndex = ref<null | number>(null)
+const draggedElement = ref<HTMLElement | null>(null)
 const dragLocation = ref<{ x: number, y: number } | null>(null)
-const dragAnchor = ref<{ x: number, y: number }>({ x: 0, y: 0})
+const dragAnchor = ref<{ x: number, y: number }>({ x: 0, y: 0 })
+const dragMotion = ref<{ x: number, y: number }>({ x: 0, y: 0 })
+const dragRotation = ref<number>(0)
 
 function dragstart (event: DragEvent) {
   console.log('dragstart', event)
   if (event.target instanceof HTMLElement) {
     event.target.classList.add('dragging')
+    draggedElement.value = event.target
     draggedTaskIndex.value = Number(event.target.dataset.index)
     dragLocation.value = { x: event.clientX, y: event.clientY }
     dragAnchor.value = { 
       x: event.clientX - event.target.offsetLeft, 
       y: event.clientY - event.target.offsetTop
     }
+    dragMotion.value = { x: 0, y: 0 }
+    dragRotation.value = 0
   }
 }
 
@@ -163,6 +170,10 @@ function dragend (event: DragEvent) {
 
 function dragover (event: DragEvent) {
   event.preventDefault();
+  if (dragLocation.value) {
+    dragMotion.value.x = dragLocation.value.x - event.clientX;
+    dragMotion.value.y = dragLocation.value.y - event.clientY;
+  }
   dragLocation.value = { x: event.clientX, y: event.clientY }
   if (container.value) {
     const children = [...container.value.children]
@@ -192,6 +203,31 @@ function dragover (event: DragEvent) {
         draggedTaskIndex.value = index
       }
     }
+  }
+
+  if (draggedElement.value && draggedTaskIndex.value !== null) {
+    const draggedTaskSize = tasks.value[draggedTaskIndex.value]?.size || 'sm'
+
+    const dragFactor = {
+      'xs': 0.0005,
+      'sm': 0.0002,
+      'md': 0.0001,
+      'lg': 0.00005,
+      'xl':  0.00002,
+      '2xl': 0.000005
+    }[draggedTaskSize]
+
+    const dy = dragAnchor.value.y - (draggedElement.value.clientHeight / 2)
+    dragRotation.value += dy * dragMotion.value.x * dragFactor
+
+    const dx = dragAnchor.value.x - (draggedElement.value.clientWidth / 2)
+    dragRotation.value -= dx * dragMotion.value.y * dragFactor
+  }
+
+  dragRotation.value = clamp(dragRotation.value, -5, 5)
+
+  function clamp (value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max)
   }
 }
 </script>
